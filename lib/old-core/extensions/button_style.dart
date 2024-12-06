@@ -1,0 +1,53 @@
+import 'package:flutter/material.dart';
+
+extension ButtonStyleExtension on ButtonStyle {
+  ButtonStyle copyWith({
+    TextStyle? textStyle,
+    Color? backgroundColor,
+    Color? foregroundColor,
+    Color? overlayColor,
+    Color? shadowColor,
+    Color? surfaceTintColor,
+    double? elevation,
+    EdgeInsetsGeometry? padding,
+    Size? minimumSize,
+    Size? fixedSize,
+    Size? maximumSize,
+    Color? iconColor,
+    double? iconSize,
+    BorderSide? side,
+    OutlinedBorder? shape,
+    MouseCursor? mouseCursor,
+    VisualDensity? visualDensity,
+    MaterialTapTargetSize? tapTargetSize,
+    Duration? animationDuration,
+    bool? enableFeedback,
+    AlignmentGeometry? alignment,
+    InteractiveInkFeatureFactory? splashFactory,
+  }) {
+    return ButtonStyle(
+      textStyle: textStyle != null ? WidgetStateProperty.all(textStyle) : this.textStyle,
+      backgroundColor: backgroundColor != null ? WidgetStateProperty.all(backgroundColor) : this.backgroundColor,
+      foregroundColor: foregroundColor != null ? WidgetStateProperty.all(foregroundColor) : this.foregroundColor,
+      overlayColor: overlayColor != null ? WidgetStateProperty.all(overlayColor) : this.overlayColor,
+      shadowColor: shadowColor != null ? WidgetStateProperty.all(shadowColor) : this.shadowColor,
+      surfaceTintColor: surfaceTintColor != null ? WidgetStateProperty.all(surfaceTintColor) : this.surfaceTintColor,
+      elevation: elevation != null ? WidgetStateProperty.all(elevation) : this.elevation,
+      padding: padding != null ? WidgetStateProperty.all(padding) : this.padding,
+      minimumSize: minimumSize != null ? WidgetStateProperty.all(minimumSize) : this.minimumSize,
+      fixedSize: fixedSize != null ? WidgetStateProperty.all(fixedSize) : this.fixedSize,
+      maximumSize: maximumSize != null ? WidgetStateProperty.all(maximumSize) : this.maximumSize,
+      iconColor: iconColor != null ? WidgetStateProperty.all(iconColor) : this.iconColor,
+      iconSize: iconSize != null ? WidgetStateProperty.all(iconSize) : this.iconSize,
+      side: side != null ? WidgetStateProperty.all(side) : this.side,
+      shape: shape != null ? WidgetStateProperty.all(shape) : this.shape,
+      mouseCursor: mouseCursor != null ? WidgetStateProperty.all(mouseCursor) : this.mouseCursor,
+      visualDensity: visualDensity ?? this.visualDensity,
+      tapTargetSize: tapTargetSize ?? this.tapTargetSize,
+      animationDuration: animationDuration ?? this.animationDuration,
+      enableFeedback: enableFeedback ?? this.enableFeedback,
+      alignment: alignment ?? this.alignment,
+      splashFactory: splashFactory ?? this.splashFactory,
+    );
+  }
+}

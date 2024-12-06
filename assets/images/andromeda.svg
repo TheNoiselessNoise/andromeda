@@ -1,0 +1,43 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Central composition -->
+  <g transform="translate(50 50)">
+    <!-- Base app frame -->
+    <rect x="-35" y="-35" width="70" height="70" rx="14" 
+          fill="#6A5ACD" 
+          transform="rotate(45)"/>
+    
+    <!-- Outer star glow -->
+    <circle r="45" fill="url(#starGlow)" opacity="0.5">
+      <animate attributeName="r"
+               values="45;48;45"
+               dur="3s"
+               repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Main star -->
+    <path d="M0 -40 L10 -10 L40 0 L10 10 L0 40 L-10 10 L-40 0 L-10 -10 Z" 
+          fill="#FFF"
+          opacity="0.9">
+      <animate attributeName="transform"
+               attributeType="XML"
+               type="rotate"
+               from="0"
+               to="360"
+               dur="20s"
+               repeatCount="indefinite"/>
+    </path>
+
+    <!-- Inner star -->
+    <path d="M0 -20 L5 -5 L20 0 L5 5 L0 20 L-5 5 L-20 0 L-5 -5 Z" 
+          fill="#9D8CFF"
+          opacity="0.8">
+      <animate attributeName="transform"
+               attributeType="XML"
+               type="rotate"
+               from="360"
+               to="0"
+               dur="15s"
+               repeatCount="indefinite"/>
+    </path>
+  </g>
+</svg>
