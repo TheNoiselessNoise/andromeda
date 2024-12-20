@@ -1,0 +1,490 @@
+import 'package:flutter/material.dart';
+import 'package:andromeda/core/_.dart';
+import 'package:provider/provider.dart';
+
+class DragData {
+  final Node node;
+  final int sourceIndex;
+
+  const DragData(this.node, this.sourceIndex);
+}
+
+enum DropPosition {
+  before,
+  after,
+  inside,
+}
+
+class AndromedaDesigner extends StatefulWidget {
+  final SAppConfig app;
+
+  const AndromedaDesigner({
+    super.key,
+    required this.app,
+  });
+
+  @override
+  State<AndromedaDesigner> createState() => _AndromedaDesignerState();
+}
+
+class _AndromedaDesignerState extends State<AndromedaDesigner> with SingleTickerProviderStateMixin {
+  final TransformationController _transformationController = TransformationController();
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _tabController = TabController(
+      length: 3,
+      vsync: this,
+    );
+  }
+
+  void _resetView() {
+    _transformationController.value = Matrix4.identity();
+  }
+
+  Widget _buildTree(Node rootNode) {
+    return TreeNodeWidget(
+      node: rootNode,
+      level: 0,
+      tabController: _tabController,
+      showToolbox: _showToolbox,
+      validateDrop: _validateDrop,
+      showErrorToast: _showErrorToast,
+    );
+  }
+
+  // Validate if a node can be dropped at given position
+  String? _validateDrop(Node node, DragData dragData, DropPosition position) {
+    // Prevent dropping on itself
+    if (dragData.node.id == node.id) {
+      return "Can't drop node onto itself";
+    }
+
+    // Prevent dropping parent into child
+    // if (isParentOf(node, dragData.node)) {
+    //   return "Can't drop parent into its child";
+    // }
+
+    // Add your custom validation rules here
+    // Example: Prevent dropping a widget into a function
+    if (dragData.node is WidgetNode && node is FunctionNode) {
+      return "Can't drop a widget into a function";
+    }
+
+    return null; // Return null if drop is valid
+  }
+
+  Widget _buildTreeNode(Node node, [int level = 0]) {
+    return Consumer<DesignerState>(
+      builder: (context, state, child) {
+        final bool isExpanded = state.expandedNodes.contains(node.id);
+        final List<dynamic> children = node.items() as List<dynamic>;
+        final bool hasChildren = children.isNotEmpty;
+        final bool isSelected = state.selectedNode?.id == node.id;
+
+        return DragTarget<DragData>(
+          onWillAcceptWithDetails: (details) {
+            final error = _validateDrop(node, details.data, DropPosition.inside);
+            if (error != null) {
+              _showErrorToast(context, error);
+              return false;
+            }
+            return true;
+          },
+          onAcceptWithDetails: (details) {
+            // Handle the drop
+            // state.moveNode(details.data.node, node, DropPosition.inside);
+          },
+          // onWillAccept: (data) => data != null,
+          // onAccept: (data) {
+          //   state.moveNode(data.node, node, _getDropPosition(data.node, node));
+          // },
+          onMove: (details) {
+            final RenderBox box = context.findRenderObject() as RenderBox;
+            final localPosition = box.globalToLocal(details.offset);
+            final size = box.size;
+            final relativeOffset = Offset(
+              localPosition.dx / size.width,
+              localPosition.dy / size.height
+            );
+          },
+          builder: (context, candidateData, rejectedData) {
+            final isDropTarget = candidateData.isNotEmpty;
+            final dropPosition = isDropTarget 
+                ? _getDropPosition(candidateData.first!.node, node)
+                : null;
+
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    LongPressDraggable<DragData>(
+                      data: DragData(node, level),
+                      feedback: Material(
+                        elevation: 4,
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          color: Theme.of(context).colorScheme.surface,
+                          child: Text(node.label),
+                        ),
+                      ),
+                      childWhenDragging: Opacity(
+                        opacity: 0.5,
+                        child: _buildNodeContent(context, node, isExpanded, hasChildren, isSelected),
+                      ),
+                      child: _buildNodeContent(context, node, isExpanded, hasChildren, isSelected),
+                    ),
+                    if (isExpanded && hasChildren)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: children
+                              .map((child) => _buildTreeNode(child, level + 1))
+                              .toList(),
+                        ),
+                      ),
+                  ],
+                ),
+                
+                // Drop indicators
+                if (isDropTarget) ...[
+                  // Top line (for dropping before)
+                  if (dropPosition == DropPosition.before)
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        height: 2,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  
+                  // Bottom line (for dropping after)
+                  if (dropPosition == DropPosition.after)
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        height: 2,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  
+                  // Highlight border (for dropping inside)
+                  if (dropPosition == DropPosition.inside)
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.primary,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ),
+                ],
+              ],
+            );
+          },
+        );
+      },
+    );
+
+        // return Column(
+        //   crossAxisAlignment: CrossAxisAlignment.start,
+        //   children: [
+        //     Container(
+        //       decoration: BoxDecoration(
+        //         border: Border.all(color: Colors.grey.withOpacity(0.2)),
+        //         borderRadius: BorderRadius.circular(4),
+        //         color: isSelected ? Theme.of(context).colorScheme.primary.withOpacity(0.5) : Colors.transparent,
+        //       ),
+        //       margin: const EdgeInsets.symmetric(vertical: 4),
+        //       child: InkWell(
+        //         onTap: () => state.toggleExpandNode(node.id),
+        //         onDoubleTap: () {
+        //           state.toggleSelectNode(node);
+        //           if (state.selectedNode == node) {
+        //             _tabController.index = 1;
+        //             _showToolbox(context);
+        //           }
+        //         },
+        //         child: Row(
+        //           mainAxisSize: MainAxisSize.min,
+        //           children: [
+        //             if (hasChildren) ...[
+        //               SizedBox(
+        //                 width: 24,
+        //                 child: Icon(
+        //                   isExpanded ? Icons.expand_more : Icons.chevron_right,
+        //                   size: 20,
+        //                 )
+        //               ),
+        //             ],
+        //             Flexible(
+        //               child: Padding(
+        //                 padding: const EdgeInsets.all(8.0),
+        //                 child: Text(
+        //                   node.signature,
+        //                   overflow: TextOverflow.visible,
+        //                 ),
+        //               ),
+        //             ),
+        //           ],
+        //         ),
+        //       ),
+        //     ),
+        //     if (isExpanded && hasChildren) ...[
+        //       Padding(
+        //         padding: const EdgeInsets.only(left: 20),
+        //         child: Column(
+        //           crossAxisAlignment: CrossAxisAlignment.start,
+        //           children: children.map((child) => _buildTreeNode(child, level + 1)).toList(),
+        //         ),
+        //       ),
+        //     ],
+        //   ],
+        // );
+      // },
+    // );
+  }
+
+  // // Helper function to determine drop position based on drag location
+  // DropPosition _getDropPosition(Node draggedNode, Node targetNode) {
+  //   // You can add more sophisticated logic here based on your needs
+  //   // For example, checking vertical position within the target node
+  //   // For now, defaulting to inside
+  //   return DropPosition.inside;
+  // }
+
+  DropPosition _getDropPosition(Node draggedNode, Node targetNode, [Offset? dragOffset]) {
+    if (dragOffset == null) return DropPosition.inside;
+    
+    const threshold = 0.25; // 25% of the height for top/bottom regions
+    final height = dragOffset.dy;
+    
+    if (height < threshold) {
+      return DropPosition.before;
+    } else if (height > (1 - threshold)) {
+      return DropPosition.after;
+    } else {
+      return DropPosition.inside;
+    }
+  }
+
+  Widget _buildNodeContent(
+    BuildContext context,
+    Node node,
+    bool isExpanded,
+    bool hasChildren,
+    bool isSelected,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+        borderRadius: BorderRadius.circular(4),
+        color: isSelected
+            ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
+            : Colors.transparent,
+      ),
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      child: InkWell(
+        onTap: () => Provider.of<DesignerState>(context, listen: false).toggleExpandNode(node.id),
+        onDoubleTap: () {
+          final state = Provider.of<DesignerState>(context, listen: false);
+          state.toggleSelectNode(node);
+          if (state.selectedNode == node) {
+            _tabController.index = 1;
+            _showToolbox(context);
+          }
+        },
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (hasChildren)
+              Icon(
+                isExpanded ? Icons.expand_more : Icons.chevron_right,
+                size: 20,
+              ),
+            Flexible(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  node.label,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  bool isParentOf(Node possibleChild, Node possibleParent) {
+    Node? current = possibleChild;
+    while (current != null) {
+      if (current.id == possibleParent.id) {
+        return true;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  void _showErrorToast(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showToolbox(BuildContext context) async {
+    final state = Provider.of<DesignerState>(context, listen: false);
+
+    await showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(0)),
+      ),
+      barrierColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return DefaultTabController(
+          length: 3,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TabBar(
+                controller: _tabController,
+                tabs: const [
+                  Tab(icon: Icon(Icons.widgets)),
+                  Tab(icon: Icon(Icons.settings)),
+                  Tab(icon: Icon(Icons.format_list_bulleted)),
+                ],
+              ),
+              ChangeNotifierProvider.value(
+                value: state,
+                child: Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      ToolboxTabWidgets(tabController: _tabController),
+                      ToolboxTabProperties(tabController: _tabController),
+                      ToolboxTabViews(tabController: _tabController),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => DesignerState(app: widget.app),
+      child: Consumer<DesignerState>(
+        builder: (context, state, child) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                state.currentView?.title ?? "Designer",
+                style: Theme.of(context).textTheme.titleMedium
+              ),
+            ),
+            body: Column(
+              children: [
+                if (state.currentView != null) ...[
+                  Expanded(
+                    child: InteractiveViewer(
+                      transformationController: _transformationController,
+                      boundaryMargin: const EdgeInsets.all(double.infinity),
+                      minScale: 0.1,
+                      maxScale: 4.0,
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(32.0),
+                          child: _buildTreeNode(state.currentView!.node),
+                        ),
+                      ),
+                    ),
+                  ),
+                ] else ...[
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        'Select a view from the Tools panel',
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ),
+                  ),
+                ],
+
+                Row(
+                  children: [
+                    if (state.currentView != null) ...[
+                      Expanded(
+                        child: IconButton(
+                          icon: const Icon(Icons.compress),
+                          onPressed: _resetView,
+                          tooltip: 'Reset View',
+                        ),
+                      ),
+                    ],
+
+                    Expanded(
+                      child: IconButton(
+                        icon: const Icon(Icons.code),
+                        onPressed: _resetView, // TODO: Toggle between code and design view
+                        tooltip: 'Code View',
+                      ),
+                    ),
+
+                    Expanded(
+                      child: IconButton(
+                        icon: const Icon(Icons.subject),
+                        onPressed: _resetView, // TODO: Open log
+                        tooltip: 'Open Log',
+                      ),
+                    ),
+
+                    Expanded(
+                      child: IconButton(
+                        icon: const Icon(Icons.play_arrow),
+                        onPressed: _resetView, // TODO: Preview
+                        tooltip: 'Preview',
+                      ),
+                    ),
+
+                    Expanded(
+                      child: IconButton(
+                        icon: const Icon(Icons.build),
+                        onPressed: () { _showToolbox(context); },
+                        tooltip: 'Toolbox',
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

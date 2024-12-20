@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/_.dart';
 
+// TODO: rename @props to @prop
 // TODO: Reload button in ErrorHandlerWidget should also download the latest script
 
 void main() async {
@@ -24,7 +25,7 @@ void main() async {
         ChangeNotifierProvider.value(value: TranslationManager()),
         ChangeNotifierProvider.value(value: ThemeManager()),
       ],
-      child: const AndromedaMainApp(
+      child: const AndromedaApp(
         initialPage: AndromedaInitialPage()
       )
     ),

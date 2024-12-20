@@ -1,0 +1,1310 @@
+// for github copilot chat
+// ast.dart           lib/flespo/language
+// parser.dart        lib/flespo/language
+// evaluator.dart     lib/flespo/renderer
+// page.dart          lib/flespo/context
+// lexer.dart         lib/flespo/language
+// token.dart         lib/flespo/language
+// base.dart          lib/flespo/renderer
+// environment.dart   lib/flespo/renderer
+
+class Test {
+  $prop = 10
+
+  fn _init {
+    $this.$prop = 15
+  }
+
+  fn getSize($counter) {
+    if ($counter == 0) {
+      20
+    } else {
+      35
+    }
+  }
+
+  fn test() {
+    $this.$prop
+  }
+}
+
+fn greet($name, $greeting = "Hello") {
+  $greeting + " " + $name
+}
+
+fn testWidget() {
+  Container {
+    @render {
+      Text { @render { "Test Widget" } }
+    }
+  }
+}
+
+fn testWidget2() {
+  Container {
+    @render {
+      Text { @render { "Test Widget 2" } }
+    }
+  }
+}
+
+SomePage {
+  @state { 
+    $counter = 0
+    $message = greet("World")
+    $test = Test()
+  }
+
+  @render {
+    Center {
+      @render {
+        Column {
+          @style {
+            mainAxisAlignment: "center"
+          }
+
+          @render {
+            Text { @render { #$message + " " + #$counter } }
+
+            Text { @render { $test.getSize(#$counter) } }
+
+            if (#$counter > 5) { 
+              Text { @render { "Counter is greater than 5".toUpperCase() } }
+            } else {
+              Text { @render { "Counter is less than 5" } }
+            }
+
+            Button {
+              // @state {
+              //   $counter = 1
+              // }
+
+              @on { tap: #{
+                #log("##### INCREMENTING COUNTER #####")
+                #$counter = #$counter + 1
+              } }
+
+              @render {
+                Text {
+                  @style {
+                    fontSize: #$test.getSize(#$counter)
+                    
+                    if (#$counter > 5) {
+                      color: "red"
+                      fontWeight: "bold"
+                    } else {
+                      color: "blue"
+                    }
+                  }
+
+                  @render { "Increment" }
+                }
+              }
+            }
+
+            Button {
+              @on { tap: #decrement(#$counter) }
+              @render { Text { @render { "Decrement" } } }
+            }
+
+            Button {
+              @on { tap: #log(#$test.$prop) }
+              @render { Text { @render { "Log Test" } } }
+            }
+
+            if (#$counter > 5) {
+              testWidget()
+            } else {
+              testWidget2()
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// for github copilot chat
+// ast.dart           lib/flespo/language
+// parser.dart        lib/flespo/language
+// evaluator.dart     lib/flespo/renderer
+// page.dart          lib/flespo/context
+// lexer.dart         lib/flespo/language
+// token.dart         lib/flespo/language
+// base.dart          lib/flespo/renderer
+// environment.dart   lib/flespo/renderer
+
+SomePage {
+  @state { 
+    $counter = 0
+  }
+
+  @render {
+    Center {
+      @render {
+        Column {
+          @style {
+            mainAxisAlignment: "center"
+          }
+
+          @render {
+            if (#$counter > 5) { 
+              Text { @render { "Counter is greater than 5".toUpperCase() } }
+            } else {
+              Text { @render { "Counter is less than 5" } }
+            }
+
+            Button {
+              @on { tap: #{
+                #log("##### INCREMENTING COUNTER #####")
+                #$counter = #$counter + 1
+              } }
+
+              @render {
+                Text {
+                  @style {
+                    // fontSize: #$test.getSize(#$counter)
+                    
+                    if (#$counter > 5) {
+                      color: "red"
+                      fontWeight: "bold"
+                    } else {
+                      color: "blue"
+                    }
+                  }
+
+                  @render { "Increment" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+// for github copilot chat
+// ast.dart           lib/flespo/language
+// parser.dart        lib/flespo/language
+// evaluator.dart     lib/flespo/renderer
+// page.dart          lib/flespo/context
+// lexer.dart         lib/flespo/language
+// token.dart         lib/flespo/language
+// base.dart          lib/flespo/renderer
+// environment.dart   lib/flespo/renderer
+
+fn testWidget($a) {
+  Text {
+    @props { text: "Text " + $a }
+  }
+}
+
+SomePage {
+  @state { 
+    $counter = 0
+  }
+
+  @render {
+    Center {
+      @render {
+        for ($i = 0, $i < 5, $i = $i + 1) {
+          Text {
+            @props { text: "Text " + $i }
+          }
+        }
+
+        Column {
+          @style {
+            mainAxisAlignment: "center"
+          }
+
+          @render {
+            Text { @props { text: #$counter } }
+
+            ElevatedButton {
+              @on { onPressed: #{
+                #log("##### INCREMENTING PAGE COUNTER #####")
+                #$counter = #$counter + 1
+              } }
+
+              @render {
+                Text {
+                  @props { text: "Increment (rebuilds whole page)" }
+                }
+              }
+            }
+
+            ElevatedButton {
+              @state {
+                // when referencing #$counter should be found first in the widget hierarchy
+                // meaning it should be found here in Button's state and not in the Page's state
+                $counter = 1
+              }
+
+              @on { onPressed: #{
+                #log("##### INCREMENTING BUTTON COUNTER #####")
+                #$counter = #$counter + 1
+              } }
+
+              @render {
+                Text {
+                  @props { text: "Increment (rebuilds only this button)" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+fn testList() {
+  $texts = []
+
+  for ($i from 0 til 5) {
+    $text = Text { @props { text: "Text " + $i } }
+    $texts.push($text)
+  }
+
+  $texts
+}
+
+fn testMap() {
+  $text = {}
+
+  for ($i from 0 til 5) {
+    $text["text" + $i] = Text { @props { text: "Text " + $i } }
+  }
+
+  $text
+}
+
+SomePage {
+  @render {
+    Center {
+      @render {
+        Column {
+          @style {
+            mainAxisAlignment: "center"
+          }
+
+          @render {
+            foreach ($text in test()) {
+              $text
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+fn test() {
+  $texts = []
+
+  for ($i from 0 til 5) {
+    $text = Text { @props { text: "Text " + $i } }
+    $texts.push($text)
+  }
+
+  #log($texts)
+
+  $texts
+}
+
+SomePage {
+  @state {
+    $page = 0
+  }
+
+  @render {
+    Center {
+      @render {
+        Column {
+          @style {
+            mainAxisAlignment: "center"
+          }
+
+          @render {
+            Row {
+              @state {
+                $row1 = 0
+              }
+
+              @style {
+                mainAxisAlignment: "center"
+              }
+
+              @render {
+                Column {
+                  @style {
+                    mainAxisAlignment: "center"
+                  }
+
+                  @render {
+                    $test1 = 0
+                    $test2 = 5
+                    for ($i from $test1 til $test2) {
+                      Text {
+                        @props { text: "Text " + ($i + #$row1) }
+                        @style {
+                          color: "white"
+                          backgroundColor: "red"
+                        }
+                      }
+                    }
+                  }
+                }
+
+                ElevatedButton {
+                  @event { onPressed: #{ #$row1 = #$row1 + 1 } }
+                  @render { Text { @props { text: "Rebuilds Row 1" } } }
+                }
+              }
+            }
+
+            Row {
+              @state {
+                $row2 = 0
+              }
+
+              @style {
+                mainAxisAlignment: "center"
+              }
+
+              @render {
+                Column {
+                  @style {
+                    mainAxisAlignment: "center"
+                  }
+
+                  @render {
+                    $test1 = 0
+                    $test2 = 5
+                    for ($i from $test1 til $test2) {
+                      Text { @props { text: "Text " + ($i + #$row2) } }
+                    }
+                  }
+                }
+
+                ElevatedButton {
+                  @event { onPressed: #{ #$row2 = #$row2 + 1 } }
+                  @render { Text { @props { text: "Rebuilds Row 2" } } }
+                }
+              }
+            }
+
+            Row {
+              @style {
+                mainAxisAlignment: "center"
+              }
+
+              @render {
+                ElevatedButton {
+                  @event { onPressed: #{ #$page = #$page + 1 } }
+                  @render { Text { @props { text: "Rebuilds whole page" } } }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SomePage {
+  @state { 
+    $counter = 0
+  }
+
+  @render {
+    Center {
+      @render {
+        Column {
+          @style {
+            mainAxisAlignment: "center"
+          }
+
+          @render {
+            if ($counter > 5) { 
+              Text { @render { "Counter is greater than 5".toUpperCase() } }
+            } else {
+              Text { @render { "Counter is less than 5" } }
+            }
+
+            Button {
+              // @state {
+              //   $counter = 1
+              // }
+
+              @on { tap: #{ #$counter = #$counter + 1 } }
+              @render {
+                Text {
+                  @style {
+                    if ($counter > 5) {
+                      color: "red"
+                      fontWeight: "bold"
+                    } else {
+                      color: "blue"
+                    }
+                  }
+
+                  @render { "Increment" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SomePage {
+  @render {
+    Center {
+      @render {
+        Column {
+          @state { $column1 = 0 }
+    
+          @style { mainAxisAlignment: "center" }
+
+          @render {
+            Container {
+              @style {
+                padding: 10
+                test: @{
+                  color: "red"
+                }
+                test2: Text {
+                  @style { color: "blue" }
+                  @props { text: "Hello" }
+                }
+              }
+              @render {
+                Text { @props { text: "Column 1: " + #$column1 } @style { fontWeight: "500" } }
+              }
+            }
+
+            for ($i from 0 til 5) {
+              Text { @props { text: "Text " + ($i + #$column1) } @style { fontWeight: "500" } }
+            }
+
+            ElevatedButton {
+              @style { style: @{ foregroundColor: "#ffffff" } }
+              @event { onPressed: #{ #$column1 = #$column1 + 1 } }
+              @render { Text { @props { text: "Rebuilds Center" } } }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+fn div() {
+  Divider {
+    @style {
+      color: "red"
+      thickness: 10
+    }
+  }
+}
+
+SomePage {
+  @render {
+    Scaffold {
+      @props {
+        appBar: AppBar {
+          @props {
+            title: Text { @props { text: "Some Page" } }
+          }
+        }
+        drawer: Drawer {
+          @render {
+            ListView {
+              @render {
+                ListTile {
+                  @props {
+                    title: Text { @props { text: "Home" } }
+                    leading: Icon { @props { icon: "home" } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      @render {
+        Center {
+          @render {
+            Column {
+              @state { $column1 = 0 }
+        
+              @style { mainAxisAlignment: "center" }
+
+              @render {
+                Container {
+                  @style {
+                    padding: 10
+                    test: @{
+                      color: "red"
+                    }
+                    test2: Text {
+                      @style { color: "blue" }
+                      @props { text: "Hello" }
+                    }
+                  }
+                  @render {
+                    Text { @props { text: "Column 1: " + #$column1 } @style { fontWeight: "500" } }
+                  }
+                }
+
+                div()
+
+                for ($i from 0 til 5) {
+                  $items = [
+                    Text { @props { text: "Text " + ($i + #$column1) } @style { fontWeight: "500" } }
+                  ]
+
+                  if ($i < 4) {
+                    $items.push(div())
+                  }
+
+                  $items
+                }
+
+                div()
+
+                ElevatedButton {
+                  @style { style: @{ foregroundColor: "#ffffff" } }
+                  @event { onPressed: #{ #$column1 = #$column1 + 1 } }
+                  @render { Text { @props { text: "Rebuilds Center" } } }
+                }
+
+                Form {
+                  @props {
+                    id: "form"
+                  }
+
+                  @event {
+                    onSubmit: #($values) {
+                      #log($values)
+                    }
+                  }
+
+                  @render {
+                    Column {
+                      @render {
+                        TextField {
+                          @props {
+                            id: "text-field"
+                            initialValue: "Initial Value"
+                            labelBuilder: # ($v) {
+                              #log($v)
+                            }
+                          }
+                        }
+
+                        IntEnumField {
+                          @props {
+                            id: "int-enum"
+                            initialValue: 1
+                            options: [ 1, 2, 3 ]
+                          }
+                        }
+
+                        SubmitButton {
+                          @render {
+                            Text { @props { text: "Submit" } }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+App {
+  @config {
+    title: "Flespo"
+    theme: @{
+      primaryColor: "#6200EE"
+      accentColor: "#03DAC6"
+    }
+  }
+
+  @pages {
+    SomePage {
+      @render {
+        SafeArea {
+          @render {
+            Column {
+              @state { $count = 0 }
+              @render {
+                ElevatedButton {
+                  @event { onPressed: #{ #$count = #$count + 1 } }
+                  @render { Text { @props { text: "Click me" } @style { color: "#ffffff" } } }
+                }
+                Text { @props { text: "Count: " + #$count } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+fn div() {
+  Divider {
+    @style {
+      color: "#ff0000"
+      thickness: 2
+    }
+  }
+}
+
+App {
+  @config {
+    title: "Flespo"
+    theme: @{
+      primary: "#6200EE"
+      secondary: "#03DAC6"
+    }
+  }
+
+  @state {
+    $appState = 20
+  }
+
+  // if, elif, else and for or foreach are supported right in any block (@render, @state, @event, etc.)
+
+  @pages {
+    SomePage {
+      // If pageState changes, whole page will rebuild
+      @state {
+        $pageState = 0
+      }
+
+      @render {
+        Scaffold {
+          @render {
+            SafeArea {
+              @render {
+                Column {
+                  // If columnState changes, only Column will rebuild
+                  @state {
+                    $columnState = 0
+                  }
+
+                  @render {
+                    Text {
+                      // Text will react (rebuild) when $appState changes
+                      @react { #$appState }
+                      @props { text: "Hello, World!: " + #$appState }
+                    }
+
+                    div()
+
+                    ElevatedButton {
+                      @event { onPressed: fn {
+                        #$appState = #$appState + 1
+                        // #log is builtin function to log to console
+                        // there are many more builtin functions to communicate from Flespo to Flutter
+                        #log(null ?? "Hello, World!")
+                        #log("Button pressed!")
+                      } }
+                      @render { Text { @props { text: "Press me!" } } }
+                    }
+
+                    ElevatedButton {
+                      @event { onPressed: fn {
+                        $snackBar = SnackBar {
+                          @props {
+                            action: SnackBarAction {
+                              @props { label: "Action" }
+                              @event { onPressed: fn {
+                                #log("SnackBar action pressed!")
+                              } }
+                            }
+                          }
+
+                          @render { Text { @props { text: "Hello, World!" + #$appState } } }
+                        }
+
+                        #showSnackBar($snackBar)
+                      } }
+                      @render { Text { @props { text: "Test SnackBar!" } } }
+                    }
+
+                    DropdownButton {
+                      @props {
+                        value: 1
+                      }
+
+                      @event {
+                        onChanged: fn ($value) {
+                          #log("DropdownButton value changed!")
+                          #log($value)
+                        }
+                      }
+
+                      @render {
+                        DropdownMenuItem {
+                          @props {
+                            value: 1
+                          }
+
+                          @render {
+                            Text {
+                              @props {
+                                text: "Item 1"
+                              }
+                            }
+                          }
+                        }
+
+                        DropdownMenuItem {
+                          @props {
+                            value: 2
+                          }
+
+                          @render {
+                            Text {
+                              @props {
+                                text: "Item 2"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+Column {
+  @state { $count = 0 }
+  @render {
+    ForLoop {
+      @props {
+        start: 0
+        end: 5
+        by: 2
+        wrap: Column {
+          @style { mainAxisAlignment: "center" }
+        }
+      }
+      @render {
+        Text { @props { text: "Text " + ($i + $count) } }
+      }
+    }
+
+    Text { @props { text: "Count: " + $count } }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SomePage {
+  @render {
+    SafeArea {
+      @render {
+        Column {
+          @state { $count = 0 }
+          @render {
+            ElevatedButton {
+              @event { onPressed: fn { $count = $count + 1 } }
+              @render { Text { @props { text: "Click me" } @style { color: "#ffffff" } } }
+            }
+
+            ForLoop {
+              @props {
+                start: 0
+                end: 5
+                by: 2
+                wrap: Column {
+                  @style { mainAxisAlignment: "center" }
+                }
+              }
+              @render {
+                Text { @props { text: "Text " + ($i + $count) } }
+              }
+            }
+
+            // no more control flow statements in @render
+            // for ($i from 0 til 5) {
+            //   $result = $count + $i
+            //   Text { @props { text: "Text " + $result } }
+            // }
+
+            Text { @props { text: "Count: " + $count } }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Text {
+  @props { text: "Animate me!" }
+  @animation {
+    Animation { @props {
+      type: "fade"
+      duration: 500
+      curve: "easeIn"
+    } }
+    Animation { @props {
+      type: "scale"
+      from: 1.0
+      to: 1.5
+      duration: 300
+      curve: "easeOut"
+    } }
+    Animation { @props {
+      type: "translate"
+      offset: { x: 100, y: 0 }
+      duration: 400
+    } }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SomePage {
+  @render {
+    SafeArea {
+      @render {
+        Column {
+          @render {
+            Image { @props { source: "https://evil.com/pwned.jpg" } }
+            Text { @props { text: "You have just been hacked!" } }
+            Text { @props { text: "Click on button bellow to unhack!" } }
+            ElevatedButton {
+              @event { onPressed: fn { #openUrl("https://evil.com/send-me-money") } }
+              @render { Text { @props { text: "Log" } } }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+App {
+  @config {
+    title: "Flespo"
+    theme: @{
+      primary: "#6200EE"
+      onPrimary: "#ffffff"
+      secondary: "#03DAC6"
+    }
+  }
+
+  @state {
+    $appState1 = 0
+    $appState2 = 0
+  }
+
+  @pages {
+    SomePage {
+      @render {
+        SafeArea {
+          @loading { Text { @props { text: "Loading..." } } }
+          @reactState { $test = 0 }
+
+          @render {
+            Column {
+              @loading { Text { @props { text: "Loading..." } } }
+
+              @state {
+                $count = 0
+                $doForLoop = false
+              }
+
+              @render {
+                // Text widget that will re-render when $test changes, but other widgets will not
+                // @reactState is used to specify the state variables that the widget should re-render on
+                Text {
+                  @loading { Text { @props { text: "Loading..." } } }
+                  @reactParent { $test }
+                  @props { text: "Test: " + $test }
+                }
+
+                ElevatedButton {
+                  @loading { Text { @props { text: "Loading..." } } }
+                  @event { onPressed: fn { $test = $test + 1 } }
+                  @render { Text { @props { text: "Click me" } @style { color: "#ffffff" } } }
+                }
+
+                Divider {
+                  @loading { Text { @props { text: "Loading..." } } }
+                }
+
+                ElevatedButton {
+                  @loading { Text { @props { text: "Loading..." } } }
+                  @event { onPressed: fn {
+                    $doForLoop = !$doForLoop
+                    $count = $count + 1
+                  } }
+                  @render { Text { @props { text: "Click me" } @style { color: "#ffffff" } } }
+                }
+
+                ForLoop {
+                  // when @condition is null (not specified or returning null), the ForLoop will always render
+                  // when @condition is false, the @conditionRender will trigger
+                  // when @condition is true, the @render will trigger
+                  @condition { $doForLoop }
+                  @conditionRender {
+                    Text { @props { text: "I am hiding the ForLoop" } }
+                  }
+                  @loading { Text { @props { text: "Loading..." } } }
+
+
+                  @props { start: 0 end: 5 }
+                  @render {
+                    Text {
+                      @props { text: "Text " + ($i + $count) }
+                      @loading { Text { @props { text: "Loading..." } } }
+                    }
+                  }
+                }
+
+                Divider {
+                  @loading { Text { @props { text: "Loading..." } } }
+                }
+
+                Form {
+                  @event { onSubmit: fn ($values) {
+                    #log("---- FORM VALUES ----")
+                    #log($values)
+                  } }
+
+                  @loading { Text { @props { text: "Loading..." } } }
+
+                  @render {
+                    Column {
+                      @loading { Text { @props { text: "Loading..." } } }
+                      @render {
+                        TextField {
+                          @props { id: "text1" initialValue: "Text 1" label: "Text 1" }
+                          @loading { Text { @props { text: "Loading..." } } }
+                        }
+
+                        BoolField {
+                          @props { id: "bool1" initialValue: true label: "Bool 1" }
+                          @loading { Text { @props { text: "Loading..." } } }
+                        }
+
+                        SubmitButton {
+                          @render { Text { @props { text: "Submit" } } }
+                          @loading { Text { @props { text: "Loading..." } } }
+                        }
+                      }
+                    }
+                  }
+                }
+
+                ElevatedButton {
+                  @animation {
+                    Animation {
+                      @props {
+                        type: "fade"
+                        duration: 500
+                        from: 0.0
+                        to: 1.0
+                        curve: "easeIn"
+                      }
+                    }
+                    Animation {
+                      @props {
+                        type: "scale"
+                        duration: 300
+                        from: 0.0
+                        to: 1.0
+                        curve: "easeOut"
+                      }
+                    }
+                  }
+
+                  @loading { Text { @props { text: "Loading..." } } }
+                  @event { onPressed: fn {
+                    $state.$animation.forward()
+                    // #log($state.$animation)
+                  } }
+                  @render { Text { @props { text: "Increment app state 1" } } }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

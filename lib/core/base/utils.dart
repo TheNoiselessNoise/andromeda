@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'package:uuid/v4.dart';
 import 'package:flutter/foundation.dart';
 import 'package:andromeda/core/_.dart';
+
+String uuidv4() => const UuidV4().generate();
 
 void myMergeMaps(Map original, Map updates) {
   updates.forEach((key, value) {
@@ -92,19 +95,20 @@ final Map<String, Function> defaultJsonifyRules = {
   'List': (List value) => value,
   'Map': (dynamic value) => value,
   'Set': (dynamic value) => value,
-  'StorableMap': (StorableMap value) => value.data,
+  'Storable': (Storable value) => value.toJsonMap(),
+  'MapTraversable': (MapTraversable value) => value.data,
 };
 
-final Map<String, Function> defaultJsonifyStorageRules = {
-  'String': (dynamic value) => "__string__$value",
-  'int': (dynamic value) => "__int__$value",
-  'double': (dynamic value) => "__double__$value",
-  'bool': (dynamic value) => "__bool__$value",
-  'DateTime': (DateTime value) => "__datetime__${value.toIso8601String()}",
-  'List': (List value) => value,
-  'Map': (dynamic value) => value,
-  'Set': (dynamic value) => value,
-};
+// final Map<String, Function> defaultJsonifyStorageRules = {
+//   'String': (dynamic value) => "__string__$value",
+//   'int': (dynamic value) => "__int__$value",
+//   'double': (dynamic value) => "__double__$value",
+//   'bool': (dynamic value) => "__bool__$value",
+//   'DateTime': (DateTime value) => "__datetime__${value.toIso8601String()}",
+//   'List': (List value) => value,
+//   'Map': (dynamic value) => value,
+//   'Set': (dynamic value) => value,
+// };
 
 final Map<String, Function> defaultUnjsonifyRules = {
   '__string__': (dynamic value) => value,
@@ -113,6 +117,12 @@ final Map<String, Function> defaultUnjsonifyRules = {
   '__bool__': (dynamic value) => value is bool ? value : value == 'true',
   '__datetime__': (String value) => DateTime.tryParse(value) ?? DateTime.now(),
 };
+
+String jsonify(dynamic data, [Map<String, Function> additionalRules = const {}]) {
+  return jsonEncodeWithRules(data, {...defaultJsonifyRules, ...additionalRules});
+}
+
+dynamic unjsonify(String jsonString) => jsonDecode(jsonString);
 
 dynamic jsonDecodeWithRules([dynamic object, Map<String, Function> rules = const {}]) {
   Map<String, Function> defaultRules = {
@@ -154,7 +164,7 @@ dynamic jsonDecodeWithRules([dynamic object, Map<String, Function> rules = const
   return object;
 }
 
-String jsonEncodeWithRules(Object object, [Map<String, Function> rules = const {}]) {
+String jsonEncodeWithRules(dynamic object, [Map<String, Function> rules = const {}]) {
   Map<String, Function> defaultRules = {
     'String': (dynamic value) => value,
     'int': (dynamic value) => value,
@@ -174,7 +184,13 @@ String jsonEncodeWithRules(Object object, [Map<String, Function> rules = const {
     String runtimeType = object.runtimeType.toString();
 
     if (!isBasicType(object) && !finalRules.containsKey(runtimeType)) {
-      if (kDebugMode) print("[jsonEncodeWithRules] Detected unhandled non-basic type: $runtimeType");
+      if (kDebugMode) {
+        print("[jsonEncodeWithRules] Detected unhandled non-basic type, returning as stringified.");
+        print("[jsonEncodeWithRules] Type: $runtimeType");
+        print("[jsonEncodeWithRules] Stringified: $object");
+      }
+
+      return object.toString();
     }
 
     if (finalRules.containsKey(runtimeType)) {

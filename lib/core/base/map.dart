@@ -1,8 +1,4 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
 import 'utils.dart';
 
 class ContextableMapTraversable extends MapTraversable {
@@ -11,71 +7,39 @@ class ContextableMapTraversable extends MapTraversable {
   const ContextableMapTraversable(this.context, super.data);
 }
 
-class StorableMap extends MapTraversable {
-  const StorableMap([super.data]);
+abstract class Storable {
+  const Storable();
 
-  String jsonify([Map<String, Function> additionalRules = const {}]) {
-    return jsonEncodeWithRules(data, {...defaultJsonifyRules, ...additionalRules});
-  }
-
-  static Map? unjsonifyString<T>(String jsonString) {
-    final newData = jsonDecode(jsonString);
-    if (newData is! Map) return null;
-    return unjsonify<T>(Map.from(newData));
-  }
-
-  static Map? unjsonify<T>(Map jsonData, [
-    Map<String, Function> additionalRules = const {}
-  ]) {
-    final newData = jsonDecodeWithRules(jsonData, {...defaultUnjsonifyRules, ...additionalRules});
-    if (newData is! Map) return null;
-    return Map.from(newData);
-  }
-
-  Future<void> to(FlutterSecureStorage storage, String key) async {
-    print("####### STORING STORABLE MAP #######");
-    print(jsonify());
-    await storage.write(key: key, value: jsonify());
-  }
-
-  static Future<T?> from<T extends StorableMap>(
-    FlutterSecureStorage storage,
-    String key,
-    T Function(Map data) constructor,
-  ) async {
-    final String? jsonString = await storage.read(key: key);
-    if (jsonString == null) return null;
-    
-    final Map? jsonData = unjsonifyString<T>(jsonString);
-    if (jsonData == null) return null;
-
-    return constructor.call(jsonData);
-  }
+  Map<String, dynamic> toJsonMap();
 }
 
-class MapTraversable {
-  final Map data;
-
+class MapTraversable extends Storable {
   const MapTraversable([this.data = const {}]);
 
+  final Map data;
   bool get hasData => data.isNotEmpty;
-
   Map get dataCopy => Map.from(data);
 
   bool has(String path) => mapListWalker(data, path) != null;
 
+  @override
+  Map<String, dynamic> toJsonMap() => Map<String, dynamic>.from(data);
+
+  bool __isDataEmpty(dynamic test) {
+    if (test is String) return test.isEmpty;
+    if (test is List) return test.isEmpty;
+    if (test is Map) return test.isEmpty;
+    if (test == null) return true;
+    return false;
+  }
+
   Map changesOf(Map newData, [
-    bool includeNonExistingKeys = false
+    bool includeNonExistingKeys = false,
+    bool Function(dynamic)? testFunc,
   ]) {
     if (newData.isEmpty) return {};
 
-    bool isDataEmpty(dynamic test) {
-      if (test is String) return test.isEmpty;
-      if (test is List) return test.isEmpty;
-      if (test is Map) return test.isEmpty;
-      if (test == null) return true;
-      return false;
-    }
+    bool Function(dynamic) isDataEmpty = testFunc ?? __isDataEmpty;
 
     Map changes = {};
     for (String key in newData.keys) {

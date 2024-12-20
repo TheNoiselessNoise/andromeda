@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:andromeda/core/_.dart';
 
 class TranslationManager extends ChangeNotifier {
   static final TranslationManager _instance = TranslationManager._internal();
   factory TranslationManager() => _instance;
   TranslationManager._internal();
 
-  final storage = const FlutterSecureStorage();
   static const String _languageKey = 'selected_language';
 
   static const String defaultLanguage = 'en-US';
@@ -30,7 +29,7 @@ class TranslationManager extends ChangeNotifier {
       'main-no-applications': 'No applications found',
       'main-edit-app': 'Edit',
       'main-remove-app': 'Remove',
-      'main-configure-app': 'Configure',
+      'main-designer-app': 'Designer',
       'main-remove-app-confirm': 'Are you sure you want to remove this application?',
       'main-remove-app-cancel': 'Cancel',
       'main-remove-app-remove': 'Remove',
@@ -40,10 +39,17 @@ class TranslationManager extends ChangeNotifier {
       // about page
       'about-version': 'Version: {0}',
       'about-description': """
-        Andromeda is an application for managing remote/local applications.
+Andromeda is an innovative mobile platform for creating and managing custom applications in a secure environment.
 
-        It allows you to add and manage applications without the need for re/compilation or re/installation.
+With Andromeda, you can create two types of applications:
+- Remote applications that synchronize with the server via API
+- Local applications that you can create and easily share with others
+
+Each application can be secured with a password or biometric verification for maximum data security.
+
+Andromeda thus brings revolution to mobile development - no complex development tools, no compilation, no installation files.
       """,
+      'about-description-2': "All you need is your idea and Andromeda",
 
       // add application page
       'addapp-close': 'Close',
@@ -72,7 +78,7 @@ class TranslationManager extends ChangeNotifier {
       'addapp-authenticate-to-add-application': 'Authenticate to add application',
       'addapp-biometric-auth-failed': 'Biometric authentication failed',
       'addapp-please-select-auth-method': 'Please select an authentication method',
-      'addapp-add-from': 'Add from',
+      'addapp-fill-from': 'Fill from',
       'addapp-camera-required-for-qr': 'Camera permission is required to scan QR codes',
       'addapp-invalid-qr-format': 'Invalid QR code format',
       'addapp-qr-code': 'QR Code',
@@ -115,7 +121,7 @@ class TranslationManager extends ChangeNotifier {
       'main-no-applications': 'Nebyly nalezeny žádné aplikace',
       'main-edit-app': 'Upravit',
       'main-remove-app': 'Odstranit',
-      'main-configure-app': 'Konfigurovat',
+      'main-designer-app': 'Návrhář',
       'main-remove-app-confirm': 'Opravdu chcete odstranit tuto aplikaci?',
       'main-remove-app-cancel': 'Zrušit',
       'main-remove-app-remove': 'Odstranit',
@@ -125,10 +131,17 @@ class TranslationManager extends ChangeNotifier {
       // about page
       'about-version': 'Verze: {0}',
       'about-description': """
-        Andromeda je aplikace pro správu vzdálených/lokálních aplikací.
-        
-        Umožňuje přidávat a spravovat aplikace bez nutnosti re/kompilace nebo re/instalace.
+Andromeda je inovativní mobilní platforma pro vytváření a správu vlastních aplikací v zabezpečeném prostředí.
+
+S Andromedou můžete vytvářet dva typy aplikací:
+- Vzdálené aplikace, které se synchronizují se serverem pomocí API
+- Lokální aplikace, které si můžete vytvořit a jednoduše sdílet s ostatními
+
+Každou aplikaci lze zabezpečit heslem nebo biometrickým ověřením pro maximální bezpečnost vašich dat.
+
+Andromeda tak přináší revoluci v mobilním vývoji - žádné složité vývojové nástroje, žádná kompilace, žádné instalační soubory.
       """,
+      'about-description-2': "Stačí jen váš nápad a Andromeda",
 
       // add application page
       'addapp-close': 'Zavřít',
@@ -157,7 +170,7 @@ class TranslationManager extends ChangeNotifier {
       'addapp-authenticate-to-add-application': 'Autentizujte se pro přidání aplikace',
       'addapp-biometric-auth-failed': 'Biometrická autentizace selhala',
       'addapp-please-select-auth-method': 'Prosím vyberte metodu autentizace',
-      'addapp-add-from': 'Přidat z',
+      'addapp-fill-from': 'Vyplnit z',
       'addapp-camera-required-for-qr': 'Je vyžadováno povolení kamery pro skenování QR kódů',
       'addapp-invalid-qr-format': 'Neplatný formát QR kódu',
       'addapp-qr-code': 'QR Kód',
@@ -201,7 +214,7 @@ class TranslationManager extends ChangeNotifier {
       'main-no-applications': 'No se encontraron aplicaciones',
       'main-edit-app': 'Editar',
       'main-remove-app': 'Eliminar',
-      'main-configure-app': 'Configurar',
+      'main-designer-app': 'Diseñador',
       'main-remove-app-confirm': '¿Está seguro de que desea eliminar esta aplicación?',
       'main-remove-app-cancel': 'Cancelar',
       'main-remove-app-remove': 'Eliminar',
@@ -211,10 +224,17 @@ class TranslationManager extends ChangeNotifier {
       // about page
       'about-version': 'Versión: {0}',
       'about-description': """
-        Andromeda es una aplicación para gestionar aplicaciones remotas/locales.
-        
-        Permite añadir y gestionar aplicaciones sin necesidad de re/compilación o re/instalación.
+Andromeda es una plataforma móvil innovadora para crear y gestionar aplicaciones personalizadas en un entorno seguro.
+
+Con Andromeda, puedes crear dos tipos de aplicaciones:
+- Aplicaciones remotas que se sincronizan con el servidor a través de API
+- Aplicaciones locales que puedes crear y compartir fácilmente con otros
+
+Cada aplicación puede protegerse con contraseña o verificación biométrica para máxima seguridad de datos.
+
+Andromeda trae así una revolución al desarrollo móvil - sin herramientas complejas, sin compilación, sin archivos de instalación.
       """,
+      'about-description-2': "Solo necesitas tu idea y Andromeda",
 
       // add application page
       'addapp-close': 'Cerrar',
@@ -243,7 +263,7 @@ class TranslationManager extends ChangeNotifier {
       'addapp-authenticate-to-add-application': 'Autentíquese para añadir la aplicación',
       'addapp-biometric-auth-failed': 'La autenticación biométrica falló',
       'addapp-please-select-auth-method': 'Por favor, seleccione un método de autenticación',
-      'addapp-add-from': 'Añadir desde',
+      'addapp-fill-from': 'Rellenar desde',
       'addapp-camera-required-for-qr': 'Se requiere permiso de cámara para escanear códigos QR',
       'addapp-invalid-qr-format': 'Formato de código QR inválido',
       'addapp-qr-code': 'Código QR',
@@ -286,7 +306,7 @@ class TranslationManager extends ChangeNotifier {
       'main-no-applications': 'Aucune application trouvée',
       'main-edit-app': 'Modifier',
       'main-remove-app': 'Supprimer',
-      'main-configure-app': 'Configurer',
+      'main-designer-app': 'Designer',
       'main-remove-app-confirm': 'Voulez-vous vraiment supprimer cette application ?',
       'main-remove-app-cancel': 'Annuler',
       'main-remove-app-remove': 'Supprimer',
@@ -294,12 +314,18 @@ class TranslationManager extends ChangeNotifier {
       'main-custom-applications': 'Applications Personnalisées',
 
       // about page
-      'about-version': 'Version : {0}',
       'about-description': """
-        Andromeda est une application de gestion d'applications distantes/locales.
-        
-        Elle permet d'ajouter et de gérer des applications sans avoir besoin de re/compiler ou re/installer.
+Andromeda est une plateforme mobile innovante pour créer et gérer des applications personnalisées dans un environnement sécurisé.
+
+Avec Andromeda, vous pouvez créer deux types d'applications :
+- Des applications distantes qui se synchronisent avec le serveur via API
+- Des applications locales que vous pouvez créer et partager facilement avec d'autres
+
+Chaque application peut être sécurisée par mot de passe ou vérification biométrique pour une sécurité maximale des données.
+
+Andromeda apporte ainsi une révolution dans le développement mobile - pas d'outils complexes, pas de compilation, pas de fichiers d'installation.
       """,
+      'about-description-2': "Il suffit de votre idée et d'Andromeda",
 
       // add application page
       'addapp-close': 'Fermer',
@@ -328,7 +354,7 @@ class TranslationManager extends ChangeNotifier {
       'addapp-authenticate-to-add-application': 'Authentifiez-vous pour ajouter l\'application',
       'addapp-biometric-auth-failed': 'L\'authentification biométrique a échoué',
       'addapp-please-select-auth-method': 'Veuillez sélectionner une méthode d\'authentification',
-      'addapp-add-from': 'Ajouter depuis',
+      'addapp-fill-from': 'Remplir à partir de',
       'addapp-camera-required-for-qr': 'L\'autorisation de la caméra est requise pour scanner les codes QR',
       'addapp-invalid-qr-format': 'Format de code QR invalide',
       'addapp-qr-code': 'Code QR',
@@ -371,7 +397,7 @@ class TranslationManager extends ChangeNotifier {
       'main-no-applications': 'Keine Anwendungen gefunden',
       'main-edit-app': 'Bearbeiten',
       'main-remove-app': 'Entfernen',
-      'main-configure-app': 'Konfigurieren',
+      'main-designer-app': 'Designer',
       'main-remove-app-confirm': 'Möchten Sie diese Anwendung wirklich entfernen?',
       'main-remove-app-cancel': 'Abbrechen',
       'main-remove-app-remove': 'Entfernen',
@@ -381,10 +407,17 @@ class TranslationManager extends ChangeNotifier {
       // about page
       'about-version': 'Version: {0}',
       'about-description': """
-        Andromeda ist eine Anwendung zur Verwaltung von Remote-/lokalen Anwendungen.
-        
-        Sie ermöglicht das Hinzufügen und Verwalten von Anwendungen ohne Neu/kompilierung oder Neu/installation.
+Andromeda ist eine innovative mobile Plattform zur Erstellung und Verwaltung individueller Anwendungen in einer sicheren Umgebung.
+
+Mit Andromeda können Sie zwei Arten von Anwendungen erstellen:
+- Remote-Anwendungen, die sich über API mit dem Server synchronisieren
+- Lokale Anwendungen, die Sie selbst erstellen und einfach mit anderen teilen können
+
+Jede Anwendung kann mit Passwort oder biometrischer Verifizierung für maximale Datensicherheit geschützt werden.
+
+Andromeda bringt damit eine Revolution in die mobile Entwicklung - keine komplexen Entwicklungstools, keine Kompilierung, keine Installationsdateien.
       """,
+      'about-description-2': "Sie brauchen nur Ihre Idee und Andromeda",
 
       // add application page
       'addapp-close': 'Schließen',
@@ -413,7 +446,7 @@ class TranslationManager extends ChangeNotifier {
       'addapp-authenticate-to-add-application': 'Authentifizieren Sie sich, um die Anwendung hinzuzufügen',
       'addapp-biometric-auth-failed': 'Biometrische Authentifizierung fehlgeschlagen',
       'addapp-please-select-auth-method': 'Bitte wählen Sie eine Authentifizierungsmethode',
-      'addapp-add-from': 'Hinzufügen von',
+      'addapp-fill-from': 'Ausfüllen von',
       'addapp-camera-required-for-qr': 'Kameraberechtigung wird für das Scannen von QR-Codes benötigt',
       'addapp-invalid-qr-format': 'Ungültiges QR-Code-Format',
       'addapp-qr-code': 'QR-Code',
@@ -451,7 +484,7 @@ class TranslationManager extends ChangeNotifier {
   };
 
   Future<void> init() async {
-    final savedLanguage = await storage.read(key: _languageKey);
+    final savedLanguage = await Storage.loadDirect(_languageKey);
     if (savedLanguage != null) {
       _currentLocale = Locale(savedLanguage);
       notifyListeners();
@@ -459,7 +492,7 @@ class TranslationManager extends ChangeNotifier {
   }
 
   Future<void> setLanguage(String languageCode) async {
-    await storage.write(key: _languageKey, value: languageCode);
+    await Storage.saveDirect(_languageKey, languageCode);
     _currentLocale = Locale(languageCode);
     notifyListeners();
   }

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:andromeda/core/_.dart';
 
-class AndromedaMainApp extends StatelessWidget {
+class AndromedaApp extends StatelessWidget {
   final Widget initialPage;
 
-  const AndromedaMainApp({
+  const AndromedaApp({
     super.key,
     required this.initialPage,
   });

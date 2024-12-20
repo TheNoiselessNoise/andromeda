@@ -1,0 +1,183 @@
+class One {
+  // constructor
+  fn _init { #log("One initialized") }
+  fn toString { "One" }
+}
+
+class Two extends One {
+  $a = null
+
+  // override constructor
+  fn _init ($a) {
+    $this.$a = $a
+    #log("Two initialized")
+  }
+
+  // override toString method
+  fn toString { "Two: " + $this.$a }
+}
+
+class Three extends Two {
+  $b = null
+
+  // override constructor
+  fn _init ($a, $b) {
+    $parent._init($a)
+    $this.$b = $b
+    #log("Three initialized")
+  }
+
+  // override toString method
+  fn toString { "Three: " + $this.$a + " " + $this.$b }
+}
+
+// parameterless function returning integer 42
+fn function { 42 }
+
+// function with parameters
+fn function2 ($a, $b = 1) { $a + $b }
+
+App {
+  @config {
+    theme: @{
+      primary: "#6200EE"
+      onPrimary: "#ffffff"
+      secondary: "#03DAC6"
+    }
+  }
+
+  // @state of the app that will be shared across all pages
+  // widget can use @reactApp to listen to the app state
+  @state {
+    $appState1 = 0
+    $appState2 = 0
+  }
+
+  @pages {
+    SomePage {
+      @loading { Text { @props { text: "Loading..." } } }
+
+      @render {
+        SafeArea {
+          // @reactState will not re-render the widget when the state changes
+          // but each child listening via @reactParent will re-render
+          @reactState { $testReact = 0 }
+          
+          // @state will re-render the widget when the state changes
+          @state { $test = 0 }
+
+          @render {
+            Column {
+              @state {
+                $count = 0
+                $doForLoop = false
+              }
+
+              @render {
+                // Text widget that will re-render when $testReact changes, but other widgets will not
+                // @reactState is used to specify the state variables that the widget should re-render on
+                Padding {
+                  @props { padding: @{ top: 16 } }
+
+                  @render {
+                    Text {
+                      @reactParent { $testReact }
+                      @props { text: "Test: " + $testReact }
+                    }
+                  }
+                }
+
+                ElevatedButton {
+                  @event { onPressed: fn { $test = $test + 1 } }
+                  @render { Text { @props { text: "Click me" } } }
+                }
+
+                Divider {}
+
+                ElevatedButton {
+                  @event { onPressed: fn {
+                    $doForLoop = !$doForLoop
+                    $count = $count + 1
+                  } }
+                  @render { Text { @props { text: "Click me" } } }
+                }
+
+                ForLoop {
+                  // when @condition is null (not specified or returning null), the ForLoop will always render
+                  // when @condition is false, the @conditionRender will trigger
+                  // when @condition is true, the @render will trigger
+                  @condition { $doForLoop }
+                  @conditionRender {
+                    Text { @props { text: "I am hiding the ForLoop" } }
+                  }
+
+                  @props { start: 0 end: 5 }
+                  @render { Text { @props { text: "Text " + ($i + $count) } } }
+                }
+
+                Divider {}
+
+                Form {
+                  @event { onSubmit: fn ($values) {
+                    #log("---- FORM VALUES ----")
+                    #log($values)
+                  } }
+
+                  @render {
+                    Column {
+                      @render {
+                        TextField {
+                          @props { id: "text1" initialValue: "Text 1" label: "Text 1" }
+                        }
+
+                        BoolField {
+                          @props { id: "bool1" initialValue: true label: "Bool 1" }
+                        }
+
+                        SubmitButton {
+                          @render { Text { @props { text: "Submit" } } }
+                        }
+                      }
+                    }
+                  }
+                }
+
+                ElevatedButton {
+                  @animation {
+                    AnimationGroup {
+                      @props {
+                        type: "parallel"
+                      }
+
+                      Animation {
+                        @props {
+                          type: "fade"
+                          duration: 500
+                          from: 0.0
+                          to: 1.0
+                          curve: "easeIn"
+                        }
+                      }
+                      Animation {
+                        @props {
+                          type: "scale"
+                          duration: 300
+                          from: 0.0
+                          to: 1.0
+                          curve: "easeOut"
+                        }
+                      }
+                    }
+                  }
+
+                  @event { onPressed: fn { $state.$animation.forward() } }
+                  @render { Text { @props { text: "Animate me" } } }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:andromeda/core/_.dart';
 import 'package:provider/provider.dart';
 
@@ -11,7 +10,6 @@ class AndromedaInitialPage extends StatefulWidget {
 }
 
 class _AndromedaInitialPageState extends State<AndromedaInitialPage> {
-  final storage = const FlutterSecureStorage();
   SAppBundle appBundle = const SAppBundle();
 
   @override
@@ -21,8 +19,7 @@ class _AndromedaInitialPageState extends State<AndromedaInitialPage> {
   }
 
   Future<void> loadApplications() async {
-    final storedAppBundle = await StorableMap.from<SAppBundle>(
-      storage,
+    final storedAppBundle = await Storage.load<SAppBundle>(
       SK.applications,
       (data) => SAppBundle(data),
     );
@@ -52,12 +49,11 @@ class _AndromedaInitialPageState extends State<AndromedaInitialPage> {
 
             if (app.isCustom) ...[
               ListTile(
-                title: Text(tr('main-configure-app')),
+                title: Text(tr('main-designer-app')),
                 onTap: () async {
                   await Navigator.push(
                     context,
-                    // TODO: page for configuring custom applications
-                    MaterialPageRoute(builder: (context) => AndromedaEditApplicationPage(app: app)),
+                    MaterialPageRoute(builder: (context) => AndromedaDesigner(app: app)),
                   );
                   await loadApplications();
                   if (context.mounted) Navigator.pop(context);
@@ -70,7 +66,7 @@ class _AndromedaInitialPageState extends State<AndromedaInitialPage> {
               onTap: () async {
                 await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AndromedaEditApplicationPage(app: app)),
+                  MaterialPageRoute(builder: (context) => AndromedaEditAppPage(app: app)),
                 );
                 await loadApplications();
                 if (context.mounted) Navigator.pop(context);
@@ -105,7 +101,8 @@ class _AndromedaInitialPageState extends State<AndromedaInitialPage> {
                 );
 
                 if (confirm) {
-                  await appBundle.removeApplication(app).to(storage, SK.applications);
+                  final newBundle = appBundle.removeApplication(app);
+                  await Storage.save(SK.applications, newBundle);
                   await loadApplications();
                 }
 
@@ -148,26 +145,40 @@ class _AndromedaInitialPageState extends State<AndromedaInitialPage> {
   }
 
   Widget buildApplications() {
-    if (appBundle.applications.isEmpty) {
+    if (appBundle.appList.isEmpty) {
       return Center(
         child: Text(tr('main-no-applications')),
       );
     }
 
-    return SingleChildScrollView(  // Add this to make the whole content scrollable
+    return SingleChildScrollView(
       child: Column(
         children: [
-          if (appBundle.hasRemoteApplications) 
+          if (appBundle.hasRemoteApps) ...[
             buildApplicationsList(
               title: tr('main-remote-applications'),
-              applications: appBundle.remoteApplications,
+              applications: appBundle.remoteAppList,
             ),
+          ],
 
-          if (appBundle.hasCustomApplications) 
+          if (appBundle.hasCustomApps) ...[
             buildApplicationsList(
               title: tr('main-custom-applications'),
-              applications: appBundle.customApplications,
+              applications: appBundle.customAppList,
             ),
+          ],
+
+          ElevatedButton(
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AndromedaCoder(app: appBundle.appList.first)),
+                  // builder: (context) => AndromedaDesigner(app: appBundle.appList.first)),
+              );
+            },
+            child: const Text('[DEV] Design First App'),
+          ),
         ],
       ),
     );
@@ -227,7 +238,7 @@ class _AndromedaInitialPageState extends State<AndromedaInitialPage> {
         onPressed: () async {
           final result = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const AndromedaAddApplicationPage()),
+            MaterialPageRoute(builder: (context) => const AndromedaAddAppPage()),
           );
           if (result == true) {
             await loadApplications();

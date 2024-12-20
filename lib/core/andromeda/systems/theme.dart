@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:andromeda/core/_.dart';
 
 class ThemeManager extends ChangeNotifier {
   static final ThemeManager _instance = ThemeManager._internal();
   factory ThemeManager() => _instance;
   ThemeManager._internal();
 
-  final storage = const FlutterSecureStorage();
   static const String _themeKey = 'selected_theme';
   ThemeMode _currentTheme = ThemeMode.system;
 
   ThemeMode get currentTheme => _currentTheme;
 
   Future<void> init() async {
-    final savedTheme = await storage.read(key: _themeKey);
+    final savedTheme = await Storage.loadDirect(_themeKey);
     if (savedTheme != null) {
       _currentTheme = ThemeMode.values.firstWhere(
         (e) => e.toString() == savedTheme,
@@ -24,7 +23,7 @@ class ThemeManager extends ChangeNotifier {
   }
 
   Future<void> setTheme(ThemeMode theme) async {
-    await storage.write(key: _themeKey, value: theme.toString());
+    await Storage.saveDirect(_themeKey, theme.toString());
     _currentTheme = theme;
     notifyListeners();
   }

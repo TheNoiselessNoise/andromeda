@@ -1,7 +1,7 @@
 import 'package:andromeda/core/_.dart';
 import 'package:flutter/material.dart';
 
-class SAppConfig extends StorableMap {
+class SAppConfig extends MapTraversable {
   const SAppConfig([super.data]);
 
   String get id => get('id');
@@ -13,10 +13,6 @@ class SAppConfig extends StorableMap {
   String? get authMethod => getString('authMethod');
   String? get hashedPassword => get('hashedPassword');
   String? get salt => get('salt');
-  
-  // NOTE: flag to determine if the app is local or remote
-  // remote: app will get it's data from a server
-  // local: app will have it's own designer / builder
   bool get isCustom => getBool('isCustom', false);
   
   bool get isPasswordProtected => isSecured && authMethod == AppSecureMethod.password && hashedPassword != null && salt != null;
@@ -69,6 +65,7 @@ class SAppConfig extends StorableMap {
     String? salt,
     bool? isCustom,
   }) => SAppConfig({
+    'id': id,
     'label': label ?? this.label,
     'serverUrl': serverUrl ?? this.serverUrl,
     'apiKey': apiKey ?? this.apiKey,
@@ -81,22 +78,32 @@ class SAppConfig extends StorableMap {
   });
 }
 
-class SAppBundle extends StorableMap {
+class SAppBundle extends MapTraversable {
+  static const String _key = 'applications';
+
   const SAppBundle([super.data]);
 
-  List<SAppConfig> get applications => getList('applications').map((app) => SAppConfig(app)).toList();
+  List<SAppConfig> get appList => getList(_key).map((app) => SAppConfig(app)).toList();
+  Map<String, SAppConfig> get appMap => Map.fromEntries(appList.map((app) => MapEntry(app.id, app)));
 
-  bool get hasRemoteApplications => applications.any((app) => !app.isCustom);
-  bool get hasCustomApplications => applications.any((app) => app.isCustom);
+  bool get hasRemoteApps => appList.any((app) => !app.isCustom);
+  bool get hasCustomApps => appList.any((app) => app.isCustom);
 
-  List<SAppConfig> get remoteApplications => applications.where((app) => !app.isCustom).toList();
-  List<SAppConfig> get customApplications => applications.where((app) => app.isCustom).toList();
+  List<SAppConfig> get remoteAppList => appList.where((app) => !app.isCustom).toList();
+  Map<String, SAppConfig> get remoteAppMap => Map.fromEntries(remoteAppList.map((app) => MapEntry(app.id, app)));
+
+  List<SAppConfig> get customAppList => appList.where((app) => app.isCustom).toList();
+  Map<String, SAppConfig> get customAppMap => Map.fromEntries(customAppList.map((app) => MapEntry(app.id, app)));
 
   SAppBundle removeApplication(SAppConfig app) => SAppBundle({
-    'applications': applications.where((a) => a != app).map((a) => a.data).toList(),
+    _key: appList.where((a) => a.id != app.id).map((a) => a.data).toList(),
   });
 
-  factory SAppBundle.from({required List<SAppConfig> applications}) => SAppBundle({
-    'applications': applications.map((app) => app.data).toList(),
+  factory SAppBundle.fromAppList(List<SAppConfig> applications) => SAppBundle({
+    _key: applications.map((app) => app.data).toList(),
+  });
+
+  factory SAppBundle.fromAppMap(Map<String, SAppConfig> applications) => SAppBundle({
+    _key: applications.values.map((app) => app.data).toList(),
   });
 }
