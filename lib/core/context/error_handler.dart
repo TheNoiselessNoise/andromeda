@@ -48,6 +48,7 @@ class ErrorHandlerWidget extends StatelessWidget {
                     stackTrace!,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       fontFamily: 'monospace',
+                      color: Colors.grey[800],
                     ),
                   ),
                 ),

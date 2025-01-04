@@ -421,10 +421,10 @@ class ExpressionEvaluator implements ExpressionVisitor<dynamic>, StatementVisito
   }
 
   @override
-  Future<dynamic> visitPropsBlockExpression(PropsBlockExpression expr) async {
-    debug('visitPropsBlockExpression', expr);
+  Future<dynamic> visitPropBlockExpression(PropBlockExpression expr) async {
+    debug('visitPropBlockExpression', expr);
 
-    return await evaluatePropsBlock(expr.block);
+    return await evaluatePropBlock(expr.block);
   }
 
   @override
@@ -892,11 +892,11 @@ class ExpressionEvaluator implements ExpressionVisitor<dynamic>, StatementVisito
   Future<Map<String, dynamic>> evaluateConfigBlock(ConfigBlock block) async {
     debug('evaluateConfigBlock', block);
 
-    return await evaluatePropsBlock(PropsBlock(block.statements));
+    return await evaluatePropBlock(PropBlock(block.statements));
   }
 
-  Future<Map<String, dynamic>> evaluatePropsBlock(BasePropsBlock block) async {
-    debug('evaluatePropsBlock', block);
+  Future<Map<String, dynamic>> evaluatePropBlock(BasePropBlock block) async {
+    debug('evaluatePropBlock', block);
 
     Map<String, dynamic> props = {};
     
@@ -1038,14 +1038,14 @@ class ExpressionEvaluator implements ExpressionVisitor<dynamic>, StatementVisito
     debug('evaluateWidgetUpdate', result);
 
     if (result is FWidget) {
-      final evaluatedProps = await evaluatePropsBlock(result.props);
+      final evaluatedProps = await evaluatePropBlock(result.prop);
 
       final newProps = evaluatedProps.entries.map((entry) {
         return PropStatement(entry.key, LiteralExpression(entry.value));
       }).toList();
 
       return result.copyWith(
-        propsBlock: PropsBlock(newProps)
+        propBlock: PropBlock(newProps)
       );
     }
 

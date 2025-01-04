@@ -662,8 +662,8 @@ class Parser {
 
     if (check(TokenType.at) && checkNext(TokenType.leftCurly)) {
       advance();
-      final propsBlock = PropsBlock(parseBlock("@props", propsContext: true).statements);
-      return PropsBlockExpression(propsBlock);
+      final propsBlock = PropBlock(parseBlock("@prop", propsContext: true).statements);
+      return PropBlockExpression(propsBlock);
     }
     
     if (match([TokenType.kFn])) {
@@ -883,7 +883,7 @@ class Parser {
     AnimationBlock? animationBlock;
     StateBlock? stateBlock;
     ReactStateBlock? reactStateBlock;
-    PropsBlock? propsBlock;
+    PropBlock? propBlock;
     StyleBlock? styleBlock;
     RenderBlock? renderBlock;
     EventBlock? eventBlock;
@@ -933,11 +933,11 @@ class Parser {
             throw ParserError("React state block already defined.", blockType);
           }
           reactStateBlock = ReactStateBlock(parseBlock("@reactState", stateContext: true).statements);
-        case 'props':
-          if (propsBlock != null) {
-            throw ParserError("Props block already defined.", blockType);
+        case 'prop':
+          if (propBlock != null) {
+            throw ParserError("Prop block already defined.", blockType);
           }
-          propsBlock = PropsBlock(parseBlock("@props", propsContext: true).statements);
+          propBlock = PropBlock(parseBlock("@prop", propsContext: true).statements);
           break;
         case 'style':
           if (styleBlock != null) {
@@ -984,7 +984,7 @@ class Parser {
       animationBlock: animationBlock,
       stateBlock: stateBlock,
       reactStateBlock: reactStateBlock,
-      propsBlock: propsBlock,
+      propBlock: propBlock,
       styleBlock: styleBlock,
       renderBlock: renderBlock,
       eventBlock: eventBlock,

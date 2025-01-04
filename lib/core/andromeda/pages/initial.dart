@@ -179,6 +179,20 @@ class _AndromedaInitialPageState extends State<AndromedaInitialPage> {
             },
             child: const Text('[DEV] Design First App'),
           ),
+
+          if (appBundle.appList.length > 1) ...[
+            ElevatedButton(
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AndromedaCoder(app: appBundle.appList[1])),
+                    // builder: (context) => AndromedaDesigner(app: appBundle.appList.first)),
+                );
+              },
+              child: const Text('[DEV] Design Second App'),
+            ),
+          ],
         ],
       ),
     );

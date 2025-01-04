@@ -47,7 +47,7 @@ abstract class ExpressionVisitor<T> {
   Future<T> visitAssignExpression(AssignExpression expr);
   Future<T> visitGroupingExpression(GroupingExpression expr);
   Future<T> visitBlockExpression(BlockExpression expr);
-  Future<T> visitPropsBlockExpression(PropsBlockExpression expr);
+  Future<T> visitPropBlockExpression(PropBlockExpression expr);
   Future<T> visitBuiltinCallExpression(BuiltinCallExpression expr);
   Future<T> visitFFunctionCall(FFunctionCall expr);
   Future<T> visitFMethodCall(FMethodCall expr);
@@ -294,10 +294,10 @@ class Block {
   }
 }
 
-class BasePropsBlock extends Block {
+class BasePropBlock extends Block {
   final String type;
 
-  BasePropsBlock(super.statements, [this.type = ""]);
+  BasePropBlock(super.statements, [this.type = ""]);
 
   @override
   String toString() {
@@ -306,12 +306,12 @@ class BasePropsBlock extends Block {
   }
 }
 
-class StyleBlock extends BasePropsBlock {
+class StyleBlock extends BasePropBlock {
   StyleBlock(List<Statement> statements) : super(statements, 'style');
 }
 
-class PropsBlock extends BasePropsBlock {
-  PropsBlock(List<Statement> statements) : super(statements, 'props');
+class PropBlock extends BasePropBlock {
+  PropBlock(List<Statement> statements) : super(statements, 'prop');
 }
 
 class BaseRenderBlock extends Block {
@@ -489,7 +489,7 @@ class FAppBlock extends Block {
   }
 }
 
-class ConfigBlock extends BasePropsBlock {
+class ConfigBlock extends BasePropBlock {
   ConfigBlock(super.statements);
 
   @override
@@ -716,7 +716,7 @@ class FWidget {
   final AnimationBlock? animationBlock;
   final StateBlock? stateBlock;
   final ReactStateBlock? reactStateBlock;
-  final PropsBlock? propsBlock;
+  final PropBlock? propBlock;
   final StyleBlock? styleBlock;
   final RenderBlock? renderBlock;
   final EventBlock? eventBlock;
@@ -731,7 +731,7 @@ class FWidget {
     this.animationBlock,
     this.stateBlock,
     this.reactStateBlock,
-    this.propsBlock,
+    this.propBlock,
     this.styleBlock,
     this.renderBlock,
     this.eventBlock,
@@ -745,7 +745,7 @@ class FWidget {
   AnimationBlock get animation => animationBlock ?? AnimationBlock([]);
   StateBlock get state => stateBlock ?? StateBlock([]);
   ReactStateBlock get reactState => reactStateBlock ?? ReactStateBlock([]);
-  PropsBlock get props => propsBlock ?? PropsBlock([]);
+  PropBlock get prop => propBlock ?? PropBlock([]);
   StyleBlock get style => styleBlock ?? StyleBlock([]);
   RenderBlock get render => renderBlock ?? RenderBlock([]);
   EventBlock get event => eventBlock ?? EventBlock({});
@@ -763,7 +763,7 @@ class FWidget {
       conditionBlock, conditionRender,
       loadingBlock, animationBlock,
       stateBlock, reactStateBlock,
-      propsBlock, styleBlock, renderBlock, eventBlock,
+      propBlock, styleBlock, renderBlock, eventBlock,
       reactAppBlock, reactParentBlock,
     ];
 
@@ -784,7 +784,7 @@ class FWidget {
     AnimationBlock? animationBlock,
     StateBlock? stateBlock,
     ReactStateBlock? reactStateBlock,
-    PropsBlock? propsBlock,
+    PropBlock? propBlock,
     StyleBlock? styleBlock,
     RenderBlock? renderBlock,
     EventBlock? eventBlock,
@@ -799,7 +799,7 @@ class FWidget {
       animationBlock: animationBlock ?? this.animationBlock,
       stateBlock: stateBlock ?? this.stateBlock,
       reactStateBlock: reactStateBlock ?? this.reactStateBlock,
-      propsBlock: propsBlock ?? this.propsBlock,
+      propBlock: propBlock ?? this.propBlock,
       styleBlock: styleBlock ?? this.styleBlock,
       renderBlock: renderBlock ?? this.renderBlock,
       eventBlock: eventBlock ?? this.eventBlock,
@@ -850,13 +850,13 @@ class BlockExpression extends Expression {
   Future<T> accept<T>(ExpressionVisitor<T> visitor) => visitor.visitBlockExpression(this);
 }
 
-class PropsBlockExpression extends Expression {
-  final PropsBlock block;
+class PropBlockExpression extends Expression {
+  final PropBlock block;
 
-  PropsBlockExpression(this.block);
+  PropBlockExpression(this.block);
 
   @override
-  Future<T> accept<T>(ExpressionVisitor<T> visitor) => visitor.visitPropsBlockExpression(this);
+  Future<T> accept<T>(ExpressionVisitor<T> visitor) => visitor.visitPropBlockExpression(this);
 }
 
 class BuiltinCallExpression extends Expression {

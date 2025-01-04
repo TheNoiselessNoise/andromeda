@@ -6,6 +6,7 @@ class SAppConfig extends MapTraversable {
 
   String get id => get('id');
   String get label => get('label');
+  String get content => getString('content');
   String get serverUrl => getString('serverUrl');
   String get apiKey => getString('apiKey');
   IconData get icon => IconData(getInt('icon', 0xe08f), fontFamily: 'MaterialIcons');
@@ -24,10 +25,12 @@ class SAppConfig extends MapTraversable {
     return null;
   }
 
+  void setContent(String content) => data['content'] = content;
+
   Color get appColor {
-    if (isPasswordProtected) return Colors.red.withOpacity(0.5);
-    if (isBiometricProtected) return Colors.green.withOpacity(0.5);
-    return Colors.blue.withOpacity(0.5);
+    if (isPasswordProtected) return Colors.red.withValues(alpha: 0.5);
+    if (isBiometricProtected) return Colors.green.withValues(alpha: 0.5);
+    return Colors.blue.withValues(alpha: 0.5);
   }
 
   factory SAppConfig.from({
@@ -35,6 +38,7 @@ class SAppConfig extends MapTraversable {
     required String label,
     required String serverUrl,
     required String apiKey,
+    String? content,
     IconData? icon,
     bool? isSecured,
     String? authMethod,
@@ -44,6 +48,7 @@ class SAppConfig extends MapTraversable {
   }) => SAppConfig({
     'id': id,
     'label': label,
+    'content': content,
     'serverUrl': serverUrl,
     'apiKey': apiKey,
     'icon': icon?.codePoint,
@@ -56,6 +61,7 @@ class SAppConfig extends MapTraversable {
 
   SAppConfig copyWith({
     String? label,
+    String? content,
     String? serverUrl,
     String? apiKey,
     IconData? icon,
@@ -67,6 +73,7 @@ class SAppConfig extends MapTraversable {
   }) => SAppConfig({
     'id': id,
     'label': label ?? this.label,
+    'content': content ?? this.content,
     'serverUrl': serverUrl ?? this.serverUrl,
     'apiKey': apiKey ?? this.apiKey,
     'icon': icon?.codePoint ?? this.icon.codePoint,

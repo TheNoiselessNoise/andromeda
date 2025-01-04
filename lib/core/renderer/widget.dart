@@ -306,8 +306,8 @@ class AndromedaWidgetState<T extends AndromedaWidget> extends State<T> with Tick
   Future<List<AndromedaWidget>> get evaluatedConditionRender => evaluator.evaluateRenderBlock(widget.widgetDef.conditionRender);
   Future<List<AndromedaWidget>> get evaluatedLoading => evaluator.evaluateRenderBlock(widget.widgetDef.loading);
   Future<List<AndromedaWidget>> get evaluatedAnimation => evaluator.evaluateRenderBlock(widget.widgetDef.animation);
-  Future<Map<String, dynamic>> get evaluatedProperties => evaluator.evaluatePropsBlock(widget.widgetDef.props);
-  Future<Map<String, dynamic>> get evaluatedStyles => evaluator.evaluatePropsBlock(widget.widgetDef.style);
+  Future<Map<String, dynamic>> get evaluatedProperties => evaluator.evaluatePropBlock(widget.widgetDef.prop);
+  Future<Map<String, dynamic>> get evaluatedStyles => evaluator.evaluatePropBlock(widget.widgetDef.style);
   Future<Map<String, dynamic>> get evaluatedHandlers => evaluator.evaluateEventBlock(widget.widgetDef.event);
   Future<List<String>> get evaluatedReactApp => evaluator.evaluateReactBlock(widget.widgetDef.reactApp);
   Future<List<String>> get evaluatedReactParent => evaluator.evaluateReactBlock(widget.widgetDef.reactParent); 

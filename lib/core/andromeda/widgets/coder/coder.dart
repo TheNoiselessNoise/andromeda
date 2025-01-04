@@ -76,7 +76,10 @@ class _AndromedaCoderState extends State<AndromedaCoder> with SingleTickerProvid
   }
 
   void _preview() async {
-    // TODO: this
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AndromedaTestAppPage(app: widget.app)),
+    );
   }
 
   @override
@@ -97,9 +100,9 @@ class _AndromedaCoderState extends State<AndromedaCoder> with SingleTickerProvid
                 // TODO: code editor with custom highlighting for custom DSL
                 Expanded(
                   child: CodeEditor(
-                    initialCode: '',
+                    initialCode: widget.app.content,
                     onChanged: (code) {
-
+                      widget.app.setContent(code);
                     },
                     style: GoogleFonts.robotoMono(
                       fontSize: 16,

@@ -172,6 +172,7 @@ class _AndromedaAddAppPageState extends State<AndromedaAddAppPage> {
         isSecured: _isSecured,
         authMethod: _selectedAuthMethod,
         isCustom: _isCustom,
+        content: AndromedaAppTemplates.helloWorld,
       );
 
       if (_isSecured && _selectedAuthMethod == AppSecureMethod.password) {
